@@ -52,4 +52,8 @@ public class Libros implements Cloneable{
 
     public void setTitulo(String autor) {
     }
+
+
+    public void remove(Libros libros) {
+    }
 }

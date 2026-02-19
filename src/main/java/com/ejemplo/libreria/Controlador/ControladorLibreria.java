@@ -2,28 +2,52 @@ package com.ejemplo.libreria.Controlador;
 
 import com.ejemplo.libreria.Model.Libros;
 import com.ejemplo.libreria.RepoLibros.RepoLibros;
+import com.ejemplo.libreria.Servicio.I_ServicioLibro;
 import com.ejemplo.libreria.Servicio.ServicioLibro;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/libros")
 
 public class ControladorLibreria {
-    private final ServicioLibro libroServicio;
-    private final RepoLibros libroRepositorio;
+    private final I_ServicioLibro i_servicio;
 
-    public ControladorLibreria(ServicioLibro libroServicio, RepoLibros libroRepositorio) {
-        this.libroServicio = libroServicio;
+    public ControladorLibreria(I_ServicioLibro i_servicio) {
+        this.i_servicio = i_servicio;
 
-        this.libroRepositorio = libroRepositorio;
     }
-    @GetMapping("/{titulo}")
+    @GetMapping("/todos")
+    public List<Libros>listar(){
+        return i_servicio.ObtenerTodos();
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<Libros> obtenerPorId(@PathVariable long id){
+        Optional<Libros> libro = i_servicio.obtenerPorId(id);
+        return libro.map(ResponseEntity::ok).orElseGet(()->
+                ResponseEntity.notFound().build());
+    }
+
+    @PostMapping
+    public ResponseEntity<Libros>crear(@RequestBody Libros libro){
+        i_servicio.guardar(libro);
+        return ResponseEntity.ok(libro);
+    }
+
+    @DeleteMapping
+    public ResponseEntity<Void> eliminar(@PathVariable long id){
+        i_servicio.eliminarPorId(id);
+        return ResponseEntity.noContent().build();
+    }
+
+    /*@GetMapping("/{titulo}")
     public String DameLibro(@PathVariable String titulo) {
-        return libroServicio.buscaLibro(titulo);
+        return libroServicio.buscalibroPorTitulo(titulo);
     }
 
     @GetMapping("/todos")
@@ -45,7 +69,7 @@ public class ControladorLibreria {
 
         return "Original: " + original.toString() + " | Copia " + copia.toString();
     }
-
+    */
 
 
 
